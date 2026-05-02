@@ -8,7 +8,6 @@ import uuid
 app = Flask(__name__)
 CORS(app)
 
-# 使用 /tmp 目录（Railway 可写）
 VIDEO_DIR = os.path.join('/tmp', 'videos')
 os.makedirs(VIDEO_DIR, exist_ok=True)
 
@@ -20,16 +19,13 @@ def parse_video():
         if not url:
             return jsonify({'error': '请提供视频链接'}), 400
         
-        print(f'正在解析: {url}')
         video_id = str(uuid.uuid4())[:8]
         output_template = os.path.join(VIDEO_DIR, f'{video_id}.%(ext)s')
         
-        # 获取视频标题
         with yt_dlp.YoutubeDL({'quiet': True}) as ydl:
             info = ydl.extract_info(url, download=False)
             title = info.get('title', 'video')
         
-        # 下载配置（云端不需要指定 ffmpeg 路径）
         ydl_opts = {
             'outtmpl': output_template,
             'quiet': True,
@@ -43,7 +39,6 @@ def parse_video():
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             ydl.download([url])
         
-        # 查找下载的文件
         downloaded_file = None
         for f in os.listdir(VIDEO_DIR):
             if f.startswith(video_id):
@@ -73,8 +68,9 @@ def serve_video(filename):
 
 @app.route('/')
 def index():
-    return jsonify({'status': 'ok'})
+    return jsonify({'status': 'ok', 'message': 'Daoer API is running'})
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
+    print(f'Daoer API 正在启动，监听端口: {port}')
     app.run(host='0.0.0.0', port=port)
