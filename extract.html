@@ -173,22 +173,64 @@
   dropZone.addEventListener('drop',e=>{e.preventDefault();dropZone.classList.remove('active');if(e.dataTransfer.files[0])handleFile(e.dataTransfer.files[0]);});
   clearFileBtn.addEventListener('click',reset);
 
-  extractBtn.addEventListener('click',async()=>{
+  extractBtn.addEventListener('click', async()=>{
     if(!selectedFile)return;
-    extractBtn.disabled=true;progressArea.classList.remove('hidden');playerArea.classList.add('hidden');
-    progressFill.style.width='0%';progressPercent.textContent='0%';progressText.textContent='读取中...';
+    
+    // 手机端大文件提示
+    const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    if(isMobile && selectedFile.size > 50 * 1024 * 1024){
+      if(!confirm(`文件较大(${formatSize(selectedFile.size)})，手机端可能处理较慢或失败。\n\n建议使用电脑端操作。\n\n是否继续？`)){
+        return;
+      }
+    }
+    
+    extractBtn.disabled=true;
+    extractBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1.5"></i>处理中...';
+    progressArea.classList.remove('hidden');
+    playerArea.classList.add('hidden');
+    progressFill.style.width='0%';
+    progressPercent.textContent='0%';
+    progressText.textContent='读取中...';
+    
     try{
-      const buf=await new Promise((res,rej)=>{const r=new FileReader();r.onload=e=>res(e.target.result);r.onerror=()=>rej(new Error('失败'));r.readAsArrayBuffer(selectedFile);});
-      progressFill.style.width='20%';progressPercent.textContent='20%';progressText.textContent='解码中...';
+      const buf=await new Promise((res,rej)=>{
+        const r=new FileReader();
+        r.onload=e=>res(e.target.result);
+        r.onerror=()=>rej(new Error('读取失败'));
+        r.readAsArrayBuffer(selectedFile);
+      });
+      
+      progressFill.style.width='30%';
+      progressPercent.textContent='30%';
+      progressText.textContent='解码中...';
+      
       const ctx=new(window.AudioContext||window.webkitAudioContext)();
-      const audio=await ctx.decodeAudioData(buf);
-      progressFill.style.width='60%';progressPercent.textContent='60%';progressText.textContent='处理中...';
+      const timeout=new Promise((_,rej)=>setTimeout(()=>rej(new Error('解码超时，请尝试较小的视频文件')),60000));
+      const audio=await Promise.race([ctx.decodeAudioData(buf),timeout]);
+      
+      progressFill.style.width='60%';
+      progressPercent.textContent='60%';
+      progressText.textContent='处理中...';
+      
       const wav=audioBufferToWav(audio);
-      progressFill.style.width='100%';progressPercent.textContent='100%';progressText.textContent='完成!';
-      extractedBlob=wav;extractedName=selectedFile.name.replace(/\.[^/.]+$/,'')+'_audio.wav';
+      
+      progressFill.style.width='100%';
+      progressPercent.textContent='100%';
+      progressText.textContent='完成!';
+      
+      extractedBlob=wav;
+      extractedName=selectedFile.name.replace(/\.[^/.]+$/,'')+'_audio.wav';
       setupPlayer(wav);
-    }catch(e){alert('提取失败');progressText.textContent='失败';}
-    finally{extractBtn.disabled=false;}
+    }catch(e){
+      console.error(e);
+      alert('提取失败：' + (e.message || '视频可能过大或格式不支持'));
+      progressText.textContent='失败';
+      progressFill.style.width='0%';
+    }
+    finally{
+      extractBtn.disabled=false;
+      extractBtn.innerHTML = '<i class="fa-solid fa-music mr-1.5"></i>提取音频';
+    }
   });
 
   function audioBufferToWav(b) {
