@@ -2,49 +2,28 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Daoer - 在线音频转MP3工具</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/lamejs/1.2.1/lame.min.js"></script>
-
     <style>
+        * { -webkit-tap-highlight-color: transparent; }
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f3f4f6;
-            background-image: linear-gradient(rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0.9)), url('https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1920&auto=format&fit=crop');
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background: #f8fafc;
+            background-image: linear-gradient(rgba(255,255,255,0.9), rgba(255,255,255,0.95)), url('https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1920&auto=format&fit=crop');
             background-size: cover;
-            background-position: center;
             background-attachment: fixed;
-        }
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #f1f1f1; }
-        ::-webkit-scrollbar-thumb { background: #c7c7c7; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #a8a8a8; }
-        @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
         }
         .drop-zone-active {
             border-color: #6366f1 !important;
             background-color: #eef2ff !important;
-            transform: scale(1.02);
         }
-        .modal-backdrop { transition: opacity 0.3s ease-in-out; }
-        .modal-content { transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out; }
-        .modal-hidden { opacity: 0; pointer-events: none; }
-        .modal-hidden .modal-content { transform: scale(0.95); opacity: 0; }
-        .feature-card { transition: all 0.3s ease; }
-        .feature-card:hover { transform: translateY(-5px); box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1); border-color: #6366f1; }
-        .file-item { animation: slideIn 0.3s ease-out; }
-        .mobile-menu { transition: transform 0.3s ease-in-out; }
-        .mobile-menu-hidden { transform: translateX(100%); }
+        .feature-card:active { transform: scale(0.97); }
     </style>
 </head>
-<body class="text-gray-800 min-h-screen flex flex-col relative">
+<body class="text-gray-800 min-h-screen flex flex-col">
 
-<!-- Header -->
 <header class="bg-white/90 backdrop-blur-md shadow-sm sticky top-0 z-40 border-b">
     <div class="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
         <div class="flex items-center gap-2">
@@ -62,68 +41,33 @@
     </div>
 </header>
 
-<main class="flex-grow container mx-auto px-4 py-12 max-w-5xl relative z-10">
-    <div class="text-center mb-12">
-        <h1 class="text-4xl md:text-5xl font-extrabold text-gray-900 mb-4">
+<main class="flex-grow px-4 py-6 max-w-6xl mx-auto w-full">
+
+    <!-- 标题 -->
+    <div class="text-center mb-6">
+        <h1 class="text-2xl md:text-4xl font-extrabold text-gray-900 mb-1">
             将任何音频转换为 <span class="text-indigo-600">MP3</span>
         </h1>
-        <p class="text-lg text-gray-600 max-w-2xl mx-auto bg-white/50 p-2 rounded-lg">
-            支持 WAV, FLAC, AAC, M4A 等格式，快速、免费转换。
-        </p>
+        <p class="text-sm text-gray-500">支持 WAV, FLAC, AAC, M4A 等格式，快速、免费转换。</p>
     </div>
 
-    <div class="bg-white rounded-2xl shadow-xl p-8 mb-12">
-        <div id="drop-zone" class="border-2 border-dashed border-gray-300 rounded-xl p-10 text-center transition-all cursor-pointer hover:border-indigo-400 hover:bg-indigo-50">
-            <div class="w-20 h-20 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                <i class="fa-solid fa-cloud-arrow-up text-3xl"></i>
+    <!-- 上传区域 -->
+    <div class="bg-white rounded-2xl shadow-lg p-5 mb-5">
+        <div id="drop-zone" class="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center cursor-pointer transition-all">
+            <div class="w-14 h-14 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center mx-auto mb-3">
+                <i class="fa-solid fa-cloud-arrow-up text-xl"></i>
             </div>
-            <h3 class="text-xl font-semibold text-gray-800 mb-2">点击或拖拽文件到此处</h3>
-            <p class="text-gray-500 text-sm mb-6">支持批量上传，单个文件最大 50MB</p>
-            <button class="bg-indigo-600 text-white px-8 py-3 rounded-lg font-medium hover:bg-indigo-700">选择文件</button>
-            <input type="file" id="file-input" class="hidden" multiple accept=".mp3,.wav,.flac,.aac,.m4a,.ogg">
+            <h3 class="text-base font-semibold text-gray-800 mb-1">点击或拖拽文件到此处</h3>
+            <p class="text-gray-400 text-xs mb-4">支持批量上传，单个文件最大 200MB</p>
+            <button class="bg-indigo-600 text-white px-8 py-3 rounded-lg text-sm font-medium hover:bg-indigo-700">选择文件</button>
+            <input type="file" id="file-input" class="hidden" multiple accept=".mp3,.wav,.flac,.aac,.m4a,.ogg,.mp4,.mov,.avi,.mkv">
         </div>
-    </div>
 
-    <div id="file-list" class="hidden bg-white rounded-2xl shadow-xl p-6 mb-12">
-        <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-            <i class="fa-solid fa-list text-indigo-600"></i>待转换文件
-            <span id="file-count" class="text-sm text-gray-500 ml-2"></span>
-        </h3>
-        <div id="file-items" class="space-y-3 max-h-96 overflow-y-auto"></div>
-    </div>
-
-    <section id="features" class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-        <div class="feature-card p-6 bg-white rounded-xl shadow-md border">
-            <div class="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center mb-4">
-                <i class="fa-solid fa-bolt text-indigo-600 text-xl"></i>
-            </div>
-            <h3 class="text-xl font-semibold mb-2">极速转换</h3>
-            <p class="text-gray-600">采用先进算法，转换速度提升 300%。</p>
-        </div>
-        <div class="feature-card p-6 bg-white rounded-xl shadow-md border">
-            <div class="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center mb-4">
-                <i class="fa-solid fa-shield-halved text-indigo-600 text-xl"></i>
-            </div>
-            <h3 class="text-xl font-semibold mb-2">安全隐私</h3>
-            <p class="text-gray-600">所有文件在本地处理，保护您的数据隐私。</p>
-        </div>
-        <div class="feature-card p-6 bg-white rounded-xl shadow-md border">
-            <div class="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center mb-4">
-                <i class="fa-solid fa-sliders text-indigo-600 text-xl"></i>
-            </div>
-            <h3 class="text-xl font-semibold mb-2">高度自定义</h3>
-            <p class="text-gray-600">支持调整比特率、采样率。</p>
-        </div>
-    </section>
-
-    <div class="bg-white rounded-2xl shadow-xl p-6 mb-12">
-        <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
-            <i class="fa-solid fa-sliders-h text-indigo-600"></i>转换设置
-        </h3>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- 设置 -->
+        <div class="mt-4 grid grid-cols-2 gap-3">
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">比特率 (kbps)</label>
-                <select id="bitrate" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                <label class="block text-xs font-medium text-gray-600 mb-1">比特率 (kbps)</label>
+                <select id="bitrate" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm">
                     <option value="128">128 kbps (标准)</option>
                     <option value="192">192 kbps (高质量)</option>
                     <option value="320">320 kbps (最佳质量)</option>
@@ -131,8 +75,8 @@
                 </select>
             </div>
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-2">采样率 (Hz)</label>
-                <select id="sampleRate" class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                <label class="block text-xs font-medium text-gray-600 mb-1">采样率 (Hz)</label>
+                <select id="sampleRate" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm">
                     <option value="44100">44100 Hz (CD音质)</option>
                     <option value="48000">48000 Hz (标准)</option>
                     <option value="22050">22050 Hz (FM音质)</option>
@@ -140,115 +84,40 @@
             </div>
         </div>
     </div>
+
+    <!-- 文件列表 -->
+    <div id="file-list" class="hidden bg-white rounded-2xl shadow-lg p-5 mb-5">
+        <h3 class="text-sm font-semibold text-gray-800 mb-3 flex items-center gap-2">
+            <i class="fa-solid fa-list text-indigo-600"></i>待转换文件
+            <span id="file-count" class="text-gray-400 text-xs"></span>
+        </h3>
+        <div id="file-items" class="space-y-2 max-h-64 overflow-y-auto"></div>
+    </div>
+
+    <!-- 功能特点 -->
+    <div class="grid grid-cols-3 md:grid-cols-3 gap-3 mb-6">
+        <div class="bg-white rounded-xl p-3 text-center shadow-sm">
+            <i class="fa-solid fa-bolt text-indigo-500 text-lg mb-1"></i>
+            <p class="text-xs font-medium text-gray-700">极速转换</p>
+        </div>
+        <div class="bg-white rounded-xl p-3 text-center shadow-sm">
+            <i class="fa-solid fa-shield-halved text-indigo-500 text-lg mb-1"></i>
+            <p class="text-xs font-medium text-gray-700">安全隐私</p>
+        </div>
+        <div class="bg-white rounded-xl p-3 text-center shadow-sm">
+            <i class="fa-solid fa-sliders text-indigo-500 text-lg mb-1"></i>
+            <p class="text-xs font-medium text-gray-700">高度自定义</p>
+        </div>
+    </div>
 </main>
 
-<footer class="bg-white/80 backdrop-blur-md border-t py-8 mt-auto">
-    <div class="container mx-auto px-4 text-center text-gray-500 text-sm">
-        <p>&copy; 2026 Daoer Audio Tools. All rights reserved.</p>
-    </div>
+<footer class="text-center text-gray-400 text-xs py-4 border-t bg-white/50">
+    &copy; 2026 Daoer Audio Tools. All rights reserved.
 </footer>
 
-<!-- Modals -->
-<div id="modal-intro" class="fixed inset-0 z-50 flex items-center justify-center modal-backdrop modal-hidden">
-    <div class="absolute inset-0 bg-black/40" onclick="closeModal('intro')"></div>
-    <div class="bg-white rounded-2xl w-full max-w-lg mx-4 relative modal-content">
-        <div class="relative h-48 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-t-2xl">
-            <div class="absolute inset-0 flex items-center justify-center">
-                <i class="fa-solid fa-headphones text-white text-6xl opacity-50"></i>
-            </div>
-            <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent flex items-end p-6">
-                <h2 class="text-2xl font-bold text-white">欢迎使用 Daoer</h2>
-            </div>
-            <button onclick="closeModal('intro')" class="absolute top-4 right-4 text-white bg-black/20 rounded-full p-2">
-                <i class="fa-solid fa-xmark text-xl"></i>
-            </button>
-        </div>
-        <div class="p-6">
-            <p class="text-gray-600 mb-4">轻松将各种格式的音频文件转换为通用的 MP3 格式。</p>
-            <ul class="space-y-2 mb-6 text-sm text-gray-600">
-                <li class="flex items-center"><i class="fa-solid fa-check text-green-500 mr-2"></i> 无需安装软件</li>
-                <li class="flex items-center"><i class="fa-solid fa-check text-green-500 mr-2"></i> 支持高达 320kbps 音质</li>
-                <li class="flex items-center"><i class="fa-solid fa-check text-green-500 mr-2"></i> 完全免费</li>
-            </ul>
-            <button onclick="closeModal('intro')" class="w-full bg-indigo-600 text-white py-3 rounded-lg font-medium">开始使用</button>
-        </div>
-    </div>
-</div>
-
-<div id="modal-faq" class="fixed inset-0 z-50 flex items-center justify-center modal-backdrop modal-hidden">
-    <div class="absolute inset-0 bg-black/40" onclick="closeModal('faq')"></div>
-    <div class="bg-white rounded-2xl w-full max-w-md mx-4 relative modal-content">
-        <div class="p-6 border-b flex justify-between">
-            <h2 class="text-xl font-bold">常见问题</h2>
-            <button onclick="closeModal('faq')" class="text-gray-400"><i class="fa-solid fa-xmark text-xl"></i></button>
-        </div>
-        <div class="p-6 max-h-[60vh] overflow-y-auto">
-            <div class="space-y-4">
-                <div><h4 class="font-semibold text-indigo-600">Q: 支持哪些格式？</h4><p class="text-sm text-gray-600">A: 支持 WAV, FLAC, AAC, M4A, OGG 等。</p></div>
-                <div><h4 class="font-semibold text-indigo-600">Q: 文件大小限制？</h4><p class="text-sm text-gray-600">A: 单个文件最大 50MB。</p></div>
-                <div><h4 class="font-semibold text-indigo-600">Q: 转换失败怎么办？</h4><p class="text-sm text-gray-600">A: 请检查文件是否损坏，或刷新后重试。</p></div>
-            </div>
-        </div>
-        <div class="p-4 bg-gray-50 text-right"><button onclick="closeModal('faq')" class="px-4 py-2 bg-white border rounded-lg">关闭</button></div>
-    </div>
-</div>
-
-<div id="modal-tools" class="fixed inset-0 z-50 flex items-center justify-center modal-backdrop modal-hidden">
-    <div class="absolute inset-0 bg-black/40" onclick="closeModal('tools')"></div>
-    <div class="bg-white rounded-2xl w-full max-w-sm mx-4 relative modal-content text-center p-8">
-        <div class="w-16 h-16 bg-yellow-100 text-yellow-600 rounded-full flex items-center justify-center mx-auto mb-4">
-            <i class="fa-solid fa-hammer text-2xl"></i>
-        </div>
-        <h2 class="text-xl font-bold mb-2">功能开发中</h2>
-        <p class="text-gray-600 mb-6">敬请期待！</p>
-        <button onclick="closeModal('tools')" class="w-full bg-gray-800 text-white py-2 rounded-lg">知道了</button>
-    </div>
-</div>
-
-<div id="modal-info" class="fixed inset-0 z-50 flex items-center justify-center modal-backdrop modal-hidden">
-    <div class="absolute inset-0 bg-black/40" onclick="closeModal('info')"></div>
-    <div class="bg-white rounded-2xl w-full max-w-md mx-4 relative modal-content">
-        <div class="p-6 border-b flex justify-between">
-            <h2 class="text-xl font-bold">使用说明</h2>
-            <button onclick="closeModal('info')" class="text-gray-400"><i class="fa-solid fa-xmark text-xl"></i></button>
-        </div>
-        <div class="p-6 space-y-3">
-            <p>1. 点击上传区域或拖拽音频文件</p>
-            <p>2. 选择输出音质（比特率和采样率）</p>
-            <p>3. 点击"开始转换"按钮</p>
-            <p>4. 转换完成后点击下载按钮</p>
-        </div>
-        <div class="p-4 bg-gray-50 text-right"><button onclick="closeModal('info')" class="px-4 py-2 bg-indigo-600 text-white rounded-lg">知道了</button></div>
-    </div>
-</div>
-
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lamejs/1.2.1/lame.min.js"></script>
 <script>
     let filesToProcess = [];
-
-    function closeMobileMenu() {
-        document.getElementById('mobile-menu').classList.add('mobile-menu-hidden');
-        document.body.style.overflow = '';
-    }
-    function scrollToTop() { window.scrollTo({ top: 0, behavior: 'smooth' }); }
-    document.getElementById('menu-btn')?.addEventListener('click', () => {
-        const menu = document.getElementById('mobile-menu');
-        menu.classList.toggle('mobile-menu-hidden');
-        document.body.style.overflow = menu.classList.contains('mobile-menu-hidden') ? '' : 'hidden';
-    });
-    function openModal(type) {
-        const modal = document.getElementById(`modal-${type}`);
-        if (modal) { modal.classList.remove('modal-hidden'); document.body.style.overflow = 'hidden'; }
-    }
-    function closeModal(type) {
-        const modal = document.getElementById(`modal-${type}`);
-        if (modal) { modal.classList.add('modal-hidden'); document.body.style.overflow = ''; }
-    }
-    window.addEventListener('load', () => {
-        if (!localStorage.getItem('daoer_intro_shown')) {
-            setTimeout(() => openModal('intro'), 500);
-            localStorage.setItem('daoer_intro_shown', 'true');
-        }
-    });
 
     const dropZone = document.getElementById('drop-zone');
     const fileInput = document.getElementById('file-input');
@@ -263,153 +132,114 @@
     fileInput.addEventListener('change', (e) => handleFiles(e.target.files));
 
     function handleFiles(files) {
-        const MAX_SIZE = 50 * 1024 * 1024;
+        const MAX_SIZE = 200 * 1024 * 1024;
         const validFiles = [];
         for (let file of files) {
-            if (file.size > MAX_SIZE) alert(`${file.name} 超过50MB限制`);
+            if (file.size > MAX_SIZE) alert(`${file.name} 超过200MB限制`);
             else if (!file.type.startsWith('audio/') && !file.name.match(/\.(mp3|wav|flac|aac|m4a|ogg)$/i)) alert(`${file.name} 不是支持的音频文件`);
             else validFiles.push(file);
         }
-        if (validFiles.length) {
-            filesToProcess.push(...validFiles);
-            updateFileList();
-        }
+        if (validFiles.length) { filesToProcess.push(...validFiles); updateFileList(); }
     }
 
     function updateFileList() {
         if (!filesToProcess.length) { fileListDiv.classList.add('hidden'); return; }
         fileListDiv.classList.remove('hidden');
-        fileCountSpan.textContent = `(${filesToProcess.length} 个)`;
+        fileCountSpan.textContent = `(${filesToProcess.length}个)`;
         fileItemsContainer.innerHTML = '';
         filesToProcess.forEach((file, i) => {
             const div = document.createElement('div');
-            div.className = 'file-item p-4 bg-gray-50 rounded-lg border';
+            div.className = 'p-3 bg-gray-50 rounded-lg border flex items-center justify-between';
             div.innerHTML = `
-                <div class="flex justify-between items-center mb-2">
-                    <div class="flex items-center gap-3 flex-1">
-                        <i class="fa-solid fa-file-audio text-indigo-600"></i>
-                        <span class="text-sm truncate flex-1">${escapeHtml(file.name)}</span>
-                        <span class="text-xs text-gray-500">${formatSize(file.size)}</span>
-                    </div>
-                    <button onclick="removeFile(${i})" class="text-red-500"><i class="fa-solid fa-trash"></i></button>
+                <div class="flex items-center gap-2 flex-1 min-w-0">
+                    <i class="fa-solid fa-file-audio text-indigo-600 text-sm"></i>
+                    <span class="text-xs truncate flex-1">${file.name.replace(/[&<>]/g, '')}</span>
+                    <span class="text-xs text-gray-400">${formatSize(file.size)}</span>
                 </div>
-                <div id="progress-${i}" class="hidden">
-                    <div class="w-full bg-gray-200 rounded-full h-2"><div id="bar-${i}" class="bg-indigo-600 h-2 rounded-full" style="width:0%"></div></div>
-                    <div class="flex justify-between text-xs mt-1"><span id="status-${i}">等待</span><span id="percent-${i}">0%</span></div>
-                </div>
-                <div id="download-${i}" class="hidden mt-2"><button onclick="downloadFile(${i})" class="text-green-600 text-sm"><i class="fa-solid fa-download"></i> 下载 MP3</button></div>
+                <button onclick="removeFile(${i})" class="text-red-400 ml-2"><i class="fa-solid fa-xmark"></i></button>
             `;
             fileItemsContainer.appendChild(div);
         });
         if (!document.getElementById('convert-btn')) {
             const btn = document.createElement('button');
             btn.id = 'convert-btn';
-            btn.className = 'w-full mt-4 bg-indigo-600 text-white py-3 rounded-lg font-medium';
-            btn.innerHTML = '<i class="fa-solid fa-play mr-2"></i>开始转换';
+            btn.className = 'w-full mt-3 bg-indigo-600 text-white py-3 rounded-lg text-sm font-medium';
+            btn.textContent = '开始转换';
             btn.onclick = startConversion;
             fileItemsContainer.appendChild(btn);
         }
     }
 
-    function escapeHtml(str) { return str.replace(/[&<>]/g, function(m) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;' }[m]; }); }
-    function formatSize(bytes) { if (!bytes) return '0 B'; const k=1024, sizes=['B','KB','MB']; let i=Math.floor(Math.log(bytes)/Math.log(k)); return parseFloat((bytes/Math.pow(k,i)).toFixed(1))+' '+sizes[i]; }
-    function removeFile(idx) { filesToProcess.splice(idx,1); updateFileList(); }
-    function updateProgress(idx, percent, status) {
-        const bar = document.getElementById(`bar-${idx}`); if(bar) bar.style.width = percent+'%';
-        const pct = document.getElementById(`percent-${idx}`); if(pct) pct.textContent = percent+'%';
-        const st = document.getElementById(`status-${idx}`); if(st) st.textContent = status;
+    function formatSize(bytes) {
+        if (!bytes) return '0 B';
+        const k=1024, sizes=['B','KB','MB'];
+        const i=Math.floor(Math.log(bytes)/Math.log(k));
+        return parseFloat((bytes/Math.pow(k,i)).toFixed(1))+' '+sizes[i];
     }
+
+    function removeFile(idx) { filesToProcess.splice(idx,1); updateFileList(); }
 
     async function startConversion() {
         if (!filesToProcess.length) return;
         const btn = document.getElementById('convert-btn');
-        btn.disabled = true;
-        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-2"></i>转换中...';
+        btn.disabled = true; btn.textContent = '转换中...';
         for (let i = 0; i < filesToProcess.length; i++) {
             await convertToMp3(filesToProcess[i], i);
         }
-        btn.disabled = false;
-        btn.innerHTML = '<i class="fa-solid fa-play mr-2"></i>开始转换';
+        btn.disabled = false; btn.textContent = '开始转换';
         alert('转换完成！');
     }
 
     async function convertToMp3(file, idx) {
         return new Promise((resolve) => {
-            const progressDiv = document.getElementById(`progress-${idx}`);
-            if (progressDiv) progressDiv.classList.remove('hidden');
-            updateProgress(idx, 0, '读取文件...');
             const reader = new FileReader();
             reader.onload = async (e) => {
                 try {
-                    updateProgress(idx, 20, '解码音频...');
                     const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                     const audioBuffer = await audioCtx.decodeAudioData(e.target.result);
-                    updateProgress(idx, 50, '转换MP3...');
-                    const targetSampleRate = parseInt(document.getElementById('sampleRate').value);
+                    const targetSr = parseInt(document.getElementById('sampleRate').value);
                     const bitrate = parseInt(document.getElementById('bitrate').value);
                     let buffer = audioBuffer;
-                    if (audioBuffer.sampleRate !== targetSampleRate) {
-                        const ratio = targetSampleRate / audioBuffer.sampleRate;
+                    if (audioBuffer.sampleRate !== targetSr) {
+                        const ratio = targetSr / audioBuffer.sampleRate;
                         const newLen = Math.floor(audioBuffer.length * ratio);
-                        const offlineCtx = new OfflineAudioContext(audioBuffer.numberOfChannels, newLen, targetSampleRate);
+                        const offlineCtx = new OfflineAudioContext(audioBuffer.numberOfChannels, newLen, targetSr);
                         const src = offlineCtx.createBufferSource();
                         src.buffer = audioBuffer;
                         src.connect(offlineCtx.destination);
                         src.start();
                         buffer = await offlineCtx.startRendering();
                     }
-                    const mp3Blob = await encodeToMp3(buffer, bitrate);
-                    updateProgress(idx, 100, '完成!');
-                    filesToProcess[idx].mp3Blob = mp3Blob;
-                    filesToProcess[idx].mp3Name = file.name.replace(/\.[^/.]+$/, '.mp3');
-                    const downloadDiv = document.getElementById(`download-${idx}`);
-                    if (downloadDiv) downloadDiv.classList.remove('hidden');
+                    const samples = new Int16Array(buffer.length * buffer.numberOfChannels);
+                    for (let ch = 0; ch < buffer.numberOfChannels; ch++) {
+                        const data = buffer.getChannelData(ch);
+                        for (let i = 0; i < buffer.length; i++) {
+                            const s = Math.max(-1, Math.min(1, data[i]));
+                            samples[i * buffer.numberOfChannels + ch] = s < 0 ? s * 0x8000 : s * 0x7FFF;
+                        }
+                    }
+                    const encoder = new lamejs.Mp3Encoder(buffer.numberOfChannels, buffer.sampleRate, bitrate);
+                    const mp3 = [];
+                    const blockSize = 1152;
+                    for (let i = 0; i < samples.length; i += blockSize) {
+                        const chunk = samples.subarray(i, i + blockSize);
+                        const mp3buf = encoder.encodeBuffer(chunk);
+                        if (mp3buf.length > 0) mp3.push(mp3buf);
+                    }
+                    const end = encoder.flush();
+                    if (end.length > 0) mp3.push(end);
+                    const blob = new Blob(mp3, { type: 'audio/mp3' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = file.name.replace(/\.[^/.]+$/, '.mp3');
+                    a.click();
+                    URL.revokeObjectURL(url);
                     resolve();
-                } catch(err) {
-                    console.error(err);
-                    updateProgress(idx, 0, '转换失败');
-                    resolve();
-                }
+                } catch(err) { console.error(err); resolve(); }
             };
             reader.readAsArrayBuffer(file);
         });
-    }
-
-    async function encodeToMp3(audioBuffer, bitrate) {
-        const channels = audioBuffer.numberOfChannels;
-        const sampleRate = audioBuffer.sampleRate;
-        const length = audioBuffer.length;
-        const samples = new Int16Array(length * channels);
-        for (let ch = 0; ch < channels; ch++) {
-            const chanData = audioBuffer.getChannelData(ch);
-            for (let i = 0; i < length; i++) {
-                const s = Math.max(-1, Math.min(1, chanData[i]));
-                samples[i * channels + ch] = s < 0 ? s * 0x8000 : s * 0x7FFF;
-            }
-        }
-        const encoder = new lamejs.Mp3Encoder(channels, sampleRate, bitrate);
-        const mp3 = [];
-        const blockSize = 1152;
-        for (let i = 0; i < samples.length; i += blockSize) {
-            const chunk = samples.subarray(i, i + blockSize);
-            const mp3buf = encoder.encodeBuffer(chunk);
-            if (mp3buf.length > 0) mp3.push(mp3buf);
-        }
-        const end = encoder.flush();
-        if (end.length > 0) mp3.push(end);
-        return new Blob(mp3, { type: 'audio/mp3' });
-    }
-
-    function downloadFile(idx) {
-        const file = filesToProcess[idx];
-        if (file && file.mp3Blob) {
-            const url = URL.createObjectURL(file.mp3Blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = file.mp3Name;
-            a.click();
-            URL.revokeObjectURL(url);
-        }
     }
 </script>
 </body>
