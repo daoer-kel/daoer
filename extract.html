@@ -2,11 +2,12 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Daoer · 音频提取器</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
+    * { -webkit-tap-highlight-color: transparent; }
     body {
       font-family: 'Inter', system-ui, -apple-system, sans-serif;
       background: #f8fafc;
@@ -14,401 +15,200 @@
       background-size: cover;
       background-attachment: fixed;
     }
-    .card-shadow {
-      box-shadow: 0 20px 35px -8px rgba(0,0,0,0.08), 0 10px 15px -6px rgba(0,0,0,0.02);
-    }
-    .drop-glow {
-      transition: all 0.2s ease;
-    }
     .drop-glow.active {
-      border-color: #4f46e5;
-      background-color: #eef2ff;
-      transform: scale(1.01);
+      border-color: #4f46e5 !important;
+      background-color: #eef2ff !important;
     }
-    button:disabled {
-      opacity: 0.6;
-      cursor: not-allowed;
-    }
-    audio::-webkit-media-controls-panel {
-      background-color: #f3f4f6;
-    }
-    audio {
-      border-radius: 12px;
-      background: #f9fafb;
-    }
+    button:disabled { opacity: 0.6; }
+    audio { border-radius: 12px; background: #f9fafb; width: 100%; }
   </style>
 </head>
 <body class="min-h-screen flex flex-col">
 
-  <!-- 头部 -->
-  <header class="bg-white/80 backdrop-blur-md border-b border-white/50 sticky top-0 z-30">
-    <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
-      <div class="flex items-center gap-2">
-        <a href="index.html" class="flex items-center gap-2 cursor-pointer hover:opacity-80 transition">
-          <div class="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white shadow">
-            <i class="fa-solid fa-headphones text-sm"></i>
-          </div>
-          <span class="font-bold text-xl text-gray-800">Daoer<span class="text-indigo-600">提取器</span></span>
-        </a>
+<header class="bg-white/90 backdrop-blur-md border-b sticky top-0 z-30">
+  <div class="max-w-6xl mx-auto px-4 h-14 flex items-center justify-between">
+    <a href="index.html" class="flex items-center gap-2">
+      <div class="w-7 h-7 bg-indigo-600 rounded-lg flex items-center justify-center text-white">
+        <i class="fa-solid fa-headphones text-xs"></i>
       </div>
-      <div class="flex items-center gap-4">
-        <a href="index.html" class="flex items-center gap-1.5 text-sm text-gray-500 hover:text-indigo-600 transition">
-          <i class="fa-solid fa-rotate"></i> 格式转换
-        </a>
-        <div class="text-sm text-gray-400 flex items-center gap-2">
-          <i class="fa-solid fa-shield-halved text-indigo-400"></i>
-          <span class="hidden sm:inline">本地处理 · 隐私安全</span>
-        </div>
-      </div>
-    </div>
-  </header>
+      <span class="font-bold text-lg text-gray-800">Daoer<span class="text-indigo-600">提取器</span></span>
+    </a>
+    <a href="index.html" class="text-xs text-gray-500 flex items-center gap-1">
+      <i class="fa-solid fa-rotate"></i> 格式转换
+    </a>
+  </div>
+</header>
 
-  <!-- 主内容 -->
-  <main class="flex-grow max-w-3xl w-full mx-auto px-4 py-10 sm:py-14">
-    <div class="text-center mb-10">
-      <h1 class="text-3xl md:text-4xl font-extrabold text-gray-900 tracking-tight">
-        视频 <span class="text-indigo-600">提取音频</span>
-      </h1>
-      <p class="text-gray-500 mt-2 max-w-xl mx-auto text-sm sm:text-base">
-        上传视频文件 · 提取音频 · 在线播放 · 免费下载
-      </p>
-    </div>
+<main class="flex-grow px-4 py-6 max-w-lg mx-auto w-full">
+  <div class="text-center mb-6">
+    <h1 class="text-2xl font-extrabold text-gray-900 mb-1">
+      视频 <span class="text-indigo-600">提取音频</span>
+    </h1>
+    <p class="text-sm text-gray-500">上传视频 · 提取音频 · 在线播放</p>
+  </div>
 
-    <!-- 上传卡片 -->
-    <div class="bg-white rounded-2xl card-shadow p-6 sm:p-8 mb-8">
-      <div id="dropZone" class="border-2 border-dashed border-gray-200 rounded-xl p-8 text-center cursor-pointer drop-glow transition-all">
-        <div class="w-16 h-16 bg-indigo-50 text-indigo-500 rounded-full flex items-center justify-center mx-auto mb-4">
-          <i class="fa-solid fa-film text-2xl"></i>
-        </div>
-        <h3 class="text-lg font-semibold text-gray-700 mb-1">点击或拖拽视频文件</h3>
-        <p class="text-gray-400 text-sm mb-5">MP4, WebM, MOV, AVI 等 · 最大 200MB</p>
-        <button id="selectBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 rounded-lg font-medium text-sm transition">
-          <i class="fa-solid fa-folder-open mr-2"></i>选择视频
-        </button>
-        <input type="file" id="fileInput" class="hidden" accept="video/*,.mp4,.webm,.mov,.avi,.mkv">
+  <div class="bg-white rounded-2xl shadow-lg p-5 mb-6">
+    <div id="dropZone" class="border-2 border-dashed border-gray-200 rounded-xl p-6 text-center cursor-pointer drop-glow transition-all">
+      <div class="w-14 h-14 bg-indigo-50 text-indigo-500 rounded-full flex items-center justify-center mx-auto mb-3">
+        <i class="fa-solid fa-film text-xl"></i>
       </div>
-
-      <!-- 文件信息 -->
-      <div id="fileInfo" class="hidden mt-6 bg-gray-50 rounded-xl p-4 border border-gray-100">
-        <div class="flex items-center justify-between flex-wrap gap-3">
-          <div class="flex items-center gap-3 min-w-0">
-            <div class="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center text-indigo-600">
-              <i class="fa-solid fa-video"></i>
-            </div>
-            <div class="truncate">
-              <p id="fileName" class="font-medium text-gray-800 truncate text-sm">视频文件.mp4</p>
-              <p id="fileSize" class="text-xs text-gray-500">12.3 MB</p>
-            </div>
-          </div>
-          <button id="clearFileBtn" class="text-gray-400 hover:text-red-500 transition p-2" title="移除">
-            <i class="fa-solid fa-trash-can"></i>
-          </button>
-        </div>
-
-        <!-- 进度条 -->
-        <div id="progressArea" class="hidden mt-4">
-          <div class="flex justify-between text-xs text-gray-600 mb-1">
-            <span id="progressText">准备中...</span>
-            <span id="progressPercent">0%</span>
-          </div>
-          <div class="w-full bg-gray-200 rounded-full h-2">
-            <div id="progressFill" class="bg-indigo-600 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 提取按钮 -->
-      <div id="actionButtons" class="hidden mt-5">
-        <button id="extractBtn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 px-5 rounded-xl font-medium transition flex items-center justify-center gap-2">
-          <i class="fa-solid fa-music"></i> 提取音频
-        </button>
-      </div>
-
-      <!-- 播放器 -->
-      <div id="playerArea" class="hidden mt-6 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl p-5 border border-indigo-100">
-        <div class="flex items-center gap-2 mb-3">
-          <i class="fa-solid fa-headphones text-indigo-600"></i>
-          <h3 class="font-semibold text-gray-800 text-sm">在线播放</h3>
-          <span class="text-xs text-gray-400 ml-auto" id="audioDuration"></span>
-        </div>
-        <audio id="audioPlayer" controls class="w-full" preload="auto"></audio>
-        <div class="flex flex-wrap gap-2 mt-3">
-          <button id="downloadBtn" class="flex items-center gap-1.5 bg-indigo-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 transition">
-            <i class="fa-solid fa-download"></i> 下载音频
-          </button>
-          <button id="extractAgainBtn" class="flex items-center gap-1.5 border border-gray-200 text-gray-600 px-4 py-2 rounded-lg text-sm hover:bg-gray-50 transition">
-            <i class="fa-solid fa-rotate-right"></i> 重新提取
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- 功能提示 -->
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-5 text-center">
-      <div class="bg-white/80 backdrop-blur-sm p-4 rounded-xl border border-white/50">
-        <i class="fa-solid fa-bolt text-indigo-500 text-xl mb-2"></i>
-        <h4 class="font-medium text-gray-700">快速提取</h4>
-        <p class="text-xs text-gray-500">浏览器本地解码</p>
-      </div>
-      <div class="bg-white/80 backdrop-blur-sm p-4 rounded-xl border border-white/50">
-        <i class="fa-solid fa-lock text-indigo-500 text-xl mb-2"></i>
-        <h4 class="font-medium text-gray-700">隐私安全</h4>
-        <p class="text-xs text-gray-500">不上传任何数据</p>
-      </div>
-      <div class="bg-white/80 backdrop-blur-sm p-4 rounded-xl border border-white/50">
-        <i class="fa-solid fa-file-audio text-indigo-500 text-xl mb-2"></i>
-        <h4 class="font-medium text-gray-700">WAV 格式</h4>
-        <p class="text-xs text-gray-500">无损音质输出</p>
-      </div>
-    </div>
-  </main>
-
-  <!-- 下载弹窗 -->
-  <div id="downloadModal" class="fixed inset-0 z-50 flex items-center justify-center" style="opacity: 0; pointer-events: none; transition: opacity 0.25s ease;">
-    <div class="absolute inset-0 bg-black/30 backdrop-blur-sm" onclick="closeDownloadModal()"></div>
-    <div class="relative bg-white rounded-2xl w-full max-w-sm mx-4 p-6 shadow-2xl" style="transform: scale(0.96); transition: transform 0.25s ease;">
-      <div class="text-center">
-        <div class="w-14 h-14 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-3">
-          <i class="fa-solid fa-circle-check text-3xl"></i>
-        </div>
-        <h3 class="text-xl font-bold text-gray-800">提取完成</h3>
-        <p id="modalAudioName" class="text-sm text-gray-500 mt-1 truncate">audio.wav</p>
-        <div class="mt-5 flex gap-3 justify-center flex-wrap">
-          <button id="cancelDownloadBtn" class="px-5 py-2.5 border border-gray-200 rounded-xl text-gray-600 hover:bg-gray-50 transition font-medium text-sm">暂不需要</button>
-          <button id="confirmDownloadBtn" class="px-5 py-2.5 bg-indigo-600 text-white rounded-xl hover:bg-indigo-700 transition font-medium text-sm flex items-center gap-2">
-            <i class="fa-solid fa-download"></i> 下载音频
-          </button>
-        </div>
-      </div>
-      <button class="absolute top-3 right-3 text-gray-400 hover:text-gray-600" onclick="closeDownloadModal()">
-        <i class="fa-solid fa-xmark text-lg"></i>
+      <h3 class="text-base font-semibold text-gray-700 mb-1">点击或拖拽视频文件</h3>
+      <p class="text-gray-400 text-xs mb-4">MP4, WebM, MOV 等 · 最大 200MB</p>
+      <button id="selectBtn" class="bg-indigo-600 text-white px-6 py-2.5 rounded-lg text-sm font-medium">
+        <i class="fa-solid fa-folder-open mr-1.5"></i>选择视频
       </button>
+      <input type="file" id="fileInput" class="hidden" accept="video/*,.mp4,.webm,.mov,.avi,.mkv">
+    </div>
+
+    <div id="fileInfo" class="hidden mt-4 bg-gray-50 rounded-xl p-3 border">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2 min-w-0">
+          <i class="fa-solid fa-video text-indigo-600 text-sm"></i>
+          <p id="fileName" class="text-xs font-medium text-gray-800 truncate"></p>
+          <span id="fileSize" class="text-xs text-gray-400"></span>
+        </div>
+        <button id="clearFileBtn" class="text-gray-400 hover:text-red-500 p-1"><i class="fa-solid fa-trash-can text-sm"></i></button>
+      </div>
+      <div id="progressArea" class="hidden mt-3">
+        <div class="flex justify-between text-xs text-gray-500 mb-1">
+          <span id="progressText">准备中...</span>
+          <span id="progressPercent">0%</span>
+        </div>
+        <div class="w-full bg-gray-200 rounded-full h-1.5">
+          <div id="progressFill" class="bg-indigo-600 h-1.5 rounded-full transition-all" style="width:0%"></div>
+        </div>
+      </div>
+    </div>
+
+    <button id="extractBtn" class="hidden w-full mt-4 bg-indigo-600 text-white py-3 rounded-xl text-sm font-medium">
+      <i class="fa-solid fa-music mr-1.5"></i>提取音频
+    </button>
+
+    <div id="playerArea" class="hidden mt-4 bg-indigo-50 rounded-xl p-4">
+      <div class="flex items-center gap-2 mb-2">
+        <i class="fa-solid fa-headphones text-indigo-600 text-sm"></i>
+        <span class="text-xs font-medium text-gray-700">在线播放</span>
+        <span id="audioDuration" class="text-xs text-gray-400 ml-auto"></span>
+      </div>
+      <audio id="audioPlayer" controls preload="auto"></audio>
+      <div class="flex gap-2 mt-3">
+        <button id="downloadBtn" class="flex-1 bg-indigo-600 text-white py-2.5 rounded-lg text-xs font-medium">
+          <i class="fa-solid fa-download mr-1"></i>下载
+        </button>
+        <button id="extractAgainBtn" class="px-4 py-2.5 border border-gray-200 text-gray-600 rounded-lg text-xs">
+          <i class="fa-solid fa-rotate-right"></i>
+        </button>
+      </div>
     </div>
   </div>
 
-  <footer class="text-center text-gray-400 text-xs py-6 border-t border-gray-100 bg-white/50">
-    Daoer 音频提取器 · 所有处理在浏览器本地完成
-  </footer>
+  <div class="grid grid-cols-3 gap-3 text-center">
+    <div class="bg-white/80 p-3 rounded-xl border"><i class="fa-solid fa-bolt text-indigo-500 text-lg mb-1"></i><p class="text-xs text-gray-600">快速提取</p></div>
+    <div class="bg-white/80 p-3 rounded-xl border"><i class="fa-solid fa-lock text-indigo-500 text-lg mb-1"></i><p class="text-xs text-gray-600">隐私安全</p></div>
+    <div class="bg-white/80 p-3 rounded-xl border"><i class="fa-solid fa-file-audio text-indigo-500 text-lg mb-1"></i><p class="text-xs text-gray-600">WAV 无损</p></div>
+  </div>
+</main>
 
-  <script>
-    (function() {
-      const dropZone = document.getElementById('dropZone');
-      const fileInput = document.getElementById('fileInput');
-      const selectBtn = document.getElementById('selectBtn');
-      const fileInfo = document.getElementById('fileInfo');
-      const fileName = document.getElementById('fileName');
-      const fileSize = document.getElementById('fileSize');
-      const clearFileBtn = document.getElementById('clearFileBtn');
-      const actionButtons = document.getElementById('actionButtons');
-      const extractBtn = document.getElementById('extractBtn');
-      const progressArea = document.getElementById('progressArea');
-      const progressFill = document.getElementById('progressFill');
-      const progressText = document.getElementById('progressText');
-      const progressPercent = document.getElementById('progressPercent');
-      const playerArea = document.getElementById('playerArea');
-      const audioPlayer = document.getElementById('audioPlayer');
-      const audioDuration = document.getElementById('audioDuration');
-      const downloadBtn = document.getElementById('downloadBtn');
-      const extractAgainBtn = document.getElementById('extractAgainBtn');
-      const downloadModal = document.getElementById('downloadModal');
-      const modalAudioName = document.getElementById('modalAudioName');
-      const confirmDownloadBtn = document.getElementById('confirmDownloadBtn');
-      const cancelDownloadBtn = document.getElementById('cancelDownloadBtn');
+<footer class="text-center text-gray-400 text-xs py-4 border-t bg-white/50">
+  Daoer · 浏览器本地处理
+</footer>
 
-      let selectedFile = null;
-      let extractedAudioBlob = null;
-      let extractedAudioName = 'audio.wav';
-      let audioUrl = null;
+<script>
+(function() {
+  const dropZone=document.getElementById('dropZone'),fileInput=document.getElementById('fileInput'),
+    selectBtn=document.getElementById('selectBtn'),fileInfo=document.getElementById('fileInfo'),
+    fileName=document.getElementById('fileName'),fileSize=document.getElementById('fileSize'),
+    clearFileBtn=document.getElementById('clearFileBtn'),extractBtn=document.getElementById('extractBtn'),
+    progressArea=document.getElementById('progressArea'),progressFill=document.getElementById('progressFill'),
+    progressText=document.getElementById('progressText'),progressPercent=document.getElementById('progressPercent'),
+    playerArea=document.getElementById('playerArea'),audioPlayer=document.getElementById('audioPlayer'),
+    audioDuration=document.getElementById('audioDuration'),downloadBtn=document.getElementById('downloadBtn'),
+    extractAgainBtn=document.getElementById('extractAgainBtn');
 
-      function resetState() {
-        selectedFile = null;
-        extractedAudioBlob = null;
-        extractedAudioName = 'audio.wav';
-        fileInput.value = '';
-        fileInfo.classList.add('hidden');
-        actionButtons.classList.add('hidden');
-        progressArea.classList.add('hidden');
-        playerArea.classList.add('hidden');
-        progressFill.style.width = '0%';
-        progressPercent.textContent = '0%';
-        progressText.textContent = '准备中...';
-        closeDownloadModal();
-        if (audioUrl) { URL.revokeObjectURL(audioUrl); audioUrl = null; }
-        audioPlayer.src = '';
-      }
+  let selectedFile=null,extractedBlob=null,extractedName='audio.wav',audioUrl=null;
 
-      function setupAudioPlayer(blob) {
-        if (audioUrl) URL.revokeObjectURL(audioUrl);
-        audioUrl = URL.createObjectURL(blob);
-        audioPlayer.src = audioUrl;
-        audioPlayer.load();
-        audioPlayer.addEventListener('loadedmetadata', function() {
-          const d = audioPlayer.duration;
-          if (d && !isNaN(d)) {
-            audioDuration.textContent = `时长: ${Math.floor(d/60)}:${String(Math.floor(d%60)).padStart(2,'0')}`;
-          }
-        }, { once: true });
-        playerArea.classList.remove('hidden');
-      }
+  function reset() {
+    selectedFile=null;extractedBlob=null;extractedName='audio.wav';
+    fileInput.value='';fileInfo.classList.add('hidden');extractBtn.classList.add('hidden');
+    progressArea.classList.add('hidden');playerArea.classList.add('hidden');
+    progressFill.style.width='0%';progressPercent.textContent='0%';progressText.textContent='准备中...';
+    if(audioUrl){URL.revokeObjectURL(audioUrl);audioUrl=null;}audioPlayer.src='';
+  }
 
-      function formatSize(bytes) {
-        if (!bytes) return '0 B';
-        const k = 1024, sizes = ['B','KB','MB','GB'];
-        const i = Math.floor(Math.log(bytes) / Math.log(k));
-        return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
-      }
+  function setupPlayer(blob) {
+    if(audioUrl)URL.revokeObjectURL(audioUrl);
+    audioUrl=URL.createObjectURL(blob);audioPlayer.src=audioUrl;audioPlayer.load();
+    audioPlayer.addEventListener('loadedmetadata',()=>{
+      const d=audioPlayer.duration;
+      if(d&&!isNaN(d))audioDuration.textContent=`${Math.floor(d/60)}:${String(Math.floor(d%60)).padStart(2,'0')}`;
+    },{once:true});
+    playerArea.classList.remove('hidden');
+  }
 
-      function displayFile(file) {
-        selectedFile = file;
-        fileName.textContent = file.name;
-        fileSize.textContent = formatSize(file.size);
-        fileInfo.classList.remove('hidden');
-        actionButtons.classList.remove('hidden');
-        progressArea.classList.add('hidden');
-        playerArea.classList.add('hidden');
-        extractedAudioBlob = null;
-        if (audioUrl) { URL.revokeObjectURL(audioUrl); audioUrl = null; }
-        audioPlayer.src = '';
-      }
+  function formatSize(b) {
+    if(!b)return'0 B';const k=1024,s=['B','KB','MB'];
+    const i=Math.floor(Math.log(b)/Math.log(k));return parseFloat((b/Math.pow(k,i)).toFixed(1))+' '+s[i];
+  }
 
-      function handleFileSelect(file) {
-        if (!file) return;
-        const validExt = ['mp4','webm','mov','avi','mkv','ogg'];
-        const ext = file.name.split('.').pop()?.toLowerCase();
-        if (!file.type.startsWith('video/') && !validExt.includes(ext)) {
-          alert('请选择有效的视频文件');
-          return;
-        }
-        if (file.size > 200 * 1024 * 1024) {
-          alert('文件过大，请选择小于 200MB 的视频');
-          return;
-        }
-        resetState();
-        displayFile(file);
-      }
+  function displayFile(f) {
+    selectedFile=f;fileName.textContent=f.name;fileSize.textContent=formatSize(f.size);
+    fileInfo.classList.remove('hidden');extractBtn.classList.remove('hidden');
+    progressArea.classList.add('hidden');playerArea.classList.add('hidden');
+    extractedBlob=null;if(audioUrl){URL.revokeObjectURL(audioUrl);audioUrl=null;}audioPlayer.src='';
+  }
 
-      selectBtn.addEventListener('click', (e) => { e.stopPropagation(); fileInput.click(); });
-      dropZone.addEventListener('click', () => fileInput.click());
-      fileInput.addEventListener('change', (e) => { if (e.target.files[0]) handleFileSelect(e.target.files[0]); });
-      dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('active'); });
-      dropZone.addEventListener('dragleave', () => dropZone.classList.remove('active'));
-      dropZone.addEventListener('drop', (e) => {
-        e.preventDefault();
-        dropZone.classList.remove('active');
-        if (e.dataTransfer.files[0]) handleFileSelect(e.dataTransfer.files[0]);
-      });
-      clearFileBtn.addEventListener('click', resetState);
+  function handleFile(f) {
+    if(!f)return;
+    const ext=f.name.split('.').pop()?.toLowerCase();
+    if(!f.type.startsWith('video/')&&!['mp4','webm','mov','avi','mkv'].includes(ext)){alert('请选择视频文件');return;}
+    if(f.size>200*1024*1024){alert('文件过大');return;}
+    reset();displayFile(f);
+  }
 
-      extractBtn.addEventListener('click', async () => {
-        if (!selectedFile) return alert('请先选择视频文件');
-        extractBtn.disabled = true;
-        progressArea.classList.remove('hidden');
-        playerArea.classList.add('hidden');
-        progressFill.style.width = '0%';
-        progressPercent.textContent = '0%';
-        progressText.textContent = '读取视频...';
+  selectBtn.addEventListener('click',e=>{e.stopPropagation();fileInput.click();});
+  dropZone.addEventListener('click',()=>fileInput.click());
+  fileInput.addEventListener('change',e=>{if(e.target.files[0])handleFile(e.target.files[0]);});
+  dropZone.addEventListener('dragover',e=>{e.preventDefault();dropZone.classList.add('active');});
+  dropZone.addEventListener('dragleave',()=>dropZone.classList.remove('active'));
+  dropZone.addEventListener('drop',e=>{e.preventDefault();dropZone.classList.remove('active');if(e.dataTransfer.files[0])handleFile(e.dataTransfer.files[0]);});
+  clearFileBtn.addEventListener('click',reset);
 
-        try {
-          const arrayBuffer = await new Promise((res, rej) => {
-            const r = new FileReader();
-            r.onload = e => res(e.target.result);
-            r.onerror = () => rej(new Error('读取失败'));
-            r.readAsArrayBuffer(selectedFile);
-          });
+  extractBtn.addEventListener('click',async()=>{
+    if(!selectedFile)return;
+    extractBtn.disabled=true;progressArea.classList.remove('hidden');playerArea.classList.add('hidden');
+    progressFill.style.width='0%';progressPercent.textContent='0%';progressText.textContent='读取中...';
+    try{
+      const buf=await new Promise((res,rej)=>{const r=new FileReader();r.onload=e=>res(e.target.result);r.onerror=()=>rej(new Error('失败'));r.readAsArrayBuffer(selectedFile);});
+      progressFill.style.width='20%';progressPercent.textContent='20%';progressText.textContent='解码中...';
+      const ctx=new(window.AudioContext||window.webkitAudioContext)();
+      const audio=await ctx.decodeAudioData(buf);
+      progressFill.style.width='60%';progressPercent.textContent='60%';progressText.textContent='处理中...';
+      const wav=audioBufferToWav(audio);
+      progressFill.style.width='100%';progressPercent.textContent='100%';progressText.textContent='完成!';
+      extractedBlob=wav;extractedName=selectedFile.name.replace(/\.[^/.]+$/,'')+'_audio.wav';
+      setupPlayer(wav);
+    }catch(e){alert('提取失败');progressText.textContent='失败';}
+    finally{extractBtn.disabled=false;}
+  });
 
-          progressFill.style.width = '15%';
-          progressPercent.textContent = '15%';
-          progressText.textContent = '解码音频...';
+  function audioBufferToWav(b) {
+    const ch=b.numberOfChannels,sr=b.sampleRate,len=b.getChannelData(0).length;
+    let interleaved;
+    if(ch===2){interleaved=new Float32Array(len*2);for(let i=0;i<len;i++){interleaved[i*2]=b.getChannelData(0)[i];interleaved[i*2+1]=b.getChannelData(1)[i];}}
+    else interleaved=b.getChannelData(0);
+    const dl=interleaved.length*2,buf=new ArrayBuffer(44+dl),v=new DataView(buf);
+    const w=(o,s)=>{for(let i=0;i<s.length;i++)v.setUint8(o+i,s.charCodeAt(i));};
+    w(0,'RIFF');v.setUint32(4,36+dl,true);w(8,'WAVE');w(12,'fmt ');v.setUint32(16,16,true);v.setUint16(20,1,true);
+    v.setUint16(22,ch,true);v.setUint32(24,sr,true);v.setUint32(28,sr*ch*2,true);v.setUint16(32,ch*2,true);
+    v.setUint16(34,16,true);w(36,'data');v.setUint32(40,dl,true);
+    let off=44;for(let i=0;i<interleaved.length;i++){const s=Math.max(-1,Math.min(1,interleaved[i]));v.setInt16(off,s<0?s*0x8000:s*0x7FFF,true);off+=2;}
+    return new Blob([buf],{type:'audio/wav'});
+  }
 
-          const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-          const audioBuffer = await audioCtx.decodeAudioData(arrayBuffer);
-
-          progressFill.style.width = '45%';
-          progressPercent.textContent = '45%';
-          progressText.textContent = '处理中...';
-
-          const wavBlob = audioBufferToWav(audioBuffer);
-
-          progressFill.style.width = '100%';
-          progressPercent.textContent = '100%';
-          progressText.textContent = '完成!';
-
-          extractedAudioBlob = wavBlob;
-          extractedAudioName = selectedFile.name.replace(/\.[^/.]+$/, '') + '_audio.wav';
-
-          setupAudioPlayer(wavBlob);
-          setTimeout(() => openDownloadModal(), 400);
-
-        } catch (err) {
-          alert('提取失败，可能视频不含有效音频');
-          progressText.textContent = '失败';
-        } finally {
-          extractBtn.disabled = false;
-        }
-      });
-
-      function audioBufferToWav(buffer) {
-        const channels = buffer.numberOfChannels;
-        const sampleRate = buffer.sampleRate;
-        const length = buffer.getChannelData(0).length;
-        let interleaved;
-        if (channels === 2) {
-          interleaved = new Float32Array(length * 2);
-          for (let i = 0; i < length; i++) {
-            interleaved[i*2] = buffer.getChannelData(0)[i];
-            interleaved[i*2+1] = buffer.getChannelData(1)[i];
-          }
-        } else {
-          interleaved = buffer.getChannelData(0);
-        }
-        const dataLen = interleaved.length * 2;
-        const buf = new ArrayBuffer(44 + dataLen);
-        const v = new DataView(buf);
-        const w = (o, s) => { for (let i = 0; i < s.length; i++) v.setUint8(o+i, s.charCodeAt(i)); };
-        w(0, 'RIFF'); v.setUint32(4, 36+dataLen, true); w(8, 'WAVE');
-        w(12, 'fmt '); v.setUint32(16, 16, true); v.setUint16(20, 1, true);
-        v.setUint16(22, channels, true); v.setUint32(24, sampleRate, true);
-        v.setUint32(28, sampleRate*channels*2, true); v.setUint16(32, channels*2, true);
-        v.setUint16(34, 16, true); w(36, 'data'); v.setUint32(40, dataLen, true);
-        let off = 44;
-        for (let i = 0; i < interleaved.length; i++) {
-          const s = Math.max(-1, Math.min(1, interleaved[i]));
-          v.setInt16(off, s < 0 ? s*0x8000 : s*0x7FFF, true);
-          off += 2;
-        }
-        return new Blob([buf], { type: 'audio/wav' });
-      }
-
-      function openDownloadModal() {
-        modalAudioName.textContent = extractedAudioName;
-        downloadModal.style.opacity = '1';
-        downloadModal.style.pointerEvents = 'auto';
-        downloadModal.querySelector('.relative').style.transform = 'scale(1)';
-      }
-
-      function closeDownloadModal() {
-        downloadModal.style.opacity = '0';
-        downloadModal.style.pointerEvents = 'none';
-        downloadModal.querySelector('.relative').style.transform = 'scale(0.96)';
-      }
-
-      function triggerDownload() {
-        if (!extractedAudioBlob) return;
-        const url = URL.createObjectURL(extractedAudioBlob);
-        const a = document.createElement('a');
-        a.href = url; a.download = extractedAudioName;
-        document.body.appendChild(a); a.click();
-        document.body.removeChild(a); URL.revokeObjectURL(url);
-      }
-
-      confirmDownloadBtn.addEventListener('click', () => { triggerDownload(); closeDownloadModal(); });
-      cancelDownloadBtn.addEventListener('click', closeDownloadModal);
-      downloadBtn.addEventListener('click', triggerDownload);
-      extractAgainBtn.addEventListener('click', () => { if (selectedFile) { extractedAudioBlob = null; if (audioUrl) { URL.revokeObjectURL(audioUrl); audioUrl = null; } audioPlayer.src = ''; playerArea.classList.add('hidden'); extractBtn.click(); } });
-      downloadModal.addEventListener('click', (e) => { if (e.target === downloadModal) closeDownloadModal(); });
-
-      resetState();
-    })();
-  </script>
+  downloadBtn.addEventListener('click',()=>{if(extractedBlob){const u=URL.createObjectURL(extractedBlob);const a=document.createElement('a');a.href=u;a.download=extractedName;a.click();URL.revokeObjectURL(u);}});
+  extractAgainBtn.addEventListener('click',()=>{if(selectedFile){extractedBlob=null;if(audioUrl){URL.revokeObjectURL(audioUrl);audioUrl=null;}audioPlayer.src='';playerArea.classList.add('hidden');extractBtn.click();}});
+  reset();
+})();
+</script>
 </body>
 </html>
