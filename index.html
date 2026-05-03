@@ -19,7 +19,6 @@
             border-color: #6366f1 !important;
             background-color: #eef2ff !important;
         }
-        .feature-card:active { transform: scale(0.97); }
     </style>
 </head>
 <body class="text-gray-800 min-h-screen flex flex-col">
@@ -44,7 +43,6 @@
 <main class="flex-grow px-4 py-8 w-full">
   <div class="max-w-4xl mx-auto">
 
-    <!-- 标题 -->
     <div class="text-center mb-6">
         <h1 class="text-2xl md:text-4xl font-extrabold text-gray-900 mb-1">
             将任何音频转换为 <span class="text-indigo-600">MP3</span>
@@ -52,7 +50,6 @@
         <p class="text-sm text-gray-500">支持 WAV, FLAC, AAC, M4A 等格式，快速、免费转换。</p>
     </div>
 
-    <!-- 上传区域 + 设置 -->
     <div class="bg-white rounded-2xl shadow-lg p-5 mb-5">
         <div class="md:flex md:gap-6">
             <div class="flex-1 mb-4 md:mb-0">
@@ -88,7 +85,6 @@
         </div>
     </div>
 
-    <!-- 文件列表 -->
     <div id="file-list" class="hidden bg-white rounded-2xl shadow-lg p-5 mb-5">
         <h3 class="text-sm font-semibold text-gray-800 mb-3 flex items-center gap-2">
             <i class="fa-solid fa-list text-indigo-600"></i>待转换文件
@@ -97,33 +93,6 @@
         <div id="file-items" class="space-y-2 max-h-64 overflow-y-auto"></div>
     </div>
 
-    <!-- 功能特点 -->
-    <div class="grid grid-cols-3 gap-3 mb-6">
-        <div class="bg-white rounded-xl p-3 text-center shadow-sm">
-            <i class="fa-solid fa-bolt text-indigo-500 text-lg mb-1"></i>
-            <p class="text-xs font-medium text-gray-700">极速转换</p>
-        </div>
-        <div class="bg-white rounded-xl p-3 text-center shadow-sm">
-            <i class="fa-solid fa-shield-halved text-indigo-500 text-lg mb-1"></i>
-            <p class="text-xs font-medium text-gray-700">安全隐私</p>
-        </div>
-        <div class="bg-white rounded-xl p-3 text-center shadow-sm">
-            <i class="fa-solid fa-sliders text-indigo-500 text-lg mb-1"></i>
-            <p class="text-xs font-medium text-gray-700">高度自定义</p>
-        </div>
-    </div>
-
-  </div>
-</main>
-
-    <!-- 文件列表 -->
-    <div id="file-list" class="hidden bg-white rounded-2xl shadow-lg p-5 mb-5">
-        <h3 class="text-sm font-semibold text-gray-800 mb-3 flex items-center gap-2">
-            <i class="fa-solid fa-list text-indigo-600"></i>待转换文件
-            <span id="file-count" class="text-gray-400 text-xs"></span>
-        </h3>
-        <div id="file-items" class="space-y-2 max-h-64 overflow-y-auto"></div>
-            <!-- 使用步骤 -->
     <div class="bg-white rounded-2xl shadow-lg p-6 mb-5">
         <h3 class="text-lg font-semibold text-gray-800 mb-4 text-center">📋 使用步骤</h3>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -145,7 +114,6 @@
         </div>
     </div>
 
-    <!-- 支持格式 -->
     <div class="bg-white rounded-2xl shadow-lg p-6 mb-5">
         <h3 class="text-lg font-semibold text-gray-800 mb-4 text-center">🎵 支持格式</h3>
         <div class="flex flex-wrap justify-center gap-2">
@@ -155,8 +123,25 @@
             <span class="px-4 py-2 bg-indigo-50 text-indigo-600 rounded-full text-sm font-medium">AAC</span>
             <span class="px-4 py-2 bg-indigo-50 text-indigo-600 rounded-full text-sm font-medium">M4A</span>
             <span class="px-4 py-2 bg-indigo-50 text-indigo-600 rounded-full text-sm font-medium">OGG</span>
+        </div>
     </div>
+
+    <div class="grid grid-cols-3 gap-3 mb-6">
+        <div class="bg-white rounded-xl p-3 text-center shadow-sm">
+            <i class="fa-solid fa-bolt text-indigo-500 text-lg mb-1"></i>
+            <p class="text-xs font-medium text-gray-700">极速转换</p>
+        </div>
+        <div class="bg-white rounded-xl p-3 text-center shadow-sm">
+            <i class="fa-solid fa-shield-halved text-indigo-500 text-lg mb-1"></i>
+            <p class="text-xs font-medium text-gray-700">安全隐私</p>
+        </div>
+        <div class="bg-white rounded-xl p-3 text-center shadow-sm">
+            <i class="fa-solid fa-sliders text-indigo-500 text-lg mb-1"></i>
+            <p class="text-xs font-medium text-gray-700">高度自定义</p>
+        </div>
     </div>
+
+  </div>
 </main>
 
 <footer class="text-center text-gray-400 text-xs py-4 border-t bg-white/50">
